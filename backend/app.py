@@ -47,5 +47,19 @@ def recommend_movies():
         "recommendations": recommendations
     })
 
+@app.route("/search", methods=["GET"])
+def search_movies():
+
+    query = request.args.get("query")
+
+    if not query:
+        return jsonify([])
+
+    matches = movies[
+        movies["title"].str.lower().str.contains(query.lower())
+    ]["title"].head(5)
+
+    return jsonify(matches.tolist())
+
 if __name__ == "__main__":
     app.run(debug=True)
