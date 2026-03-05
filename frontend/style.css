@@ -154,6 +154,13 @@ body {
   flex-direction: column;
 }
 
+.modal-info p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #ddd;
+  line-height: 1.4;
+}
+
 .close-button {
   margin-top: 20px;
   padding: 10px 15px;

@@ -30,40 +30,62 @@ def recommend(movie):
     for i in movies_list:
 
         title = movies.iloc[i[0]].title
-
-        poster = fetch_poster(title)
+        movie_id = int(movies.iloc[i[0]].movie_id)
+        poster = fetch_poster(movie_id)
 
         recommendations.append({
-        "title": title,
-        "poster": poster if poster else None
-    })
+          "title": title,
+          "movie_id": movie_id,
+          "poster": poster
+       })
 
     return recommendations
 
-def fetch_poster(movie_title):
+def fetch_poster(movie_id):
 
     try:
 
-        url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={movie_title}"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
 
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=10)
+
+        data = response.json()
+
+        poster_path = data.get("poster_path")
+
+        if poster_path:
+            return f"https://image.tmdb.org/t/p/w500{poster_path}"
+
+        return None
+
+    except Exception as e:
+        print("TMDB poster error:", e)
+        return None
+
+def fetch_movie_details(movie_id):
+
+    try:
+
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+
+        response = requests.get(url, timeout=10)
 
         if response.status_code != 200:
             return None
 
         data = response.json()
 
-        results = data.get("results")
+        poster = None
+        if data.get("poster_path"):
+            poster = f"https://image.tmdb.org/t/p/w500{data['poster_path']}"
 
-        if not results:
-            return None
-
-        poster_path = results[0].get("poster_path")
-
-        if not poster_path:
-            return None
-
-        return f"https://image.tmdb.org/t/p/w500{poster_path}"
+        return {
+            "title": data.get("title"),
+            "overview": data.get("overview"),
+            "release_date": data.get("release_date"),
+            "rating": data.get("vote_average"),
+            "poster": poster
+        }
 
     except Exception as e:
         print("TMDB error:", e)
@@ -102,5 +124,43 @@ def search_movies():
 
     return jsonify(matches.tolist())
 
+@app.route("/movie-details", methods=["GET"])
+def movie_details():
+
+    movie_id = request.args.get("id")
+
+    if not movie_id:
+        return jsonify({"error": "No movie_id provided"}), 400
+
+    try:
+
+        url = url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+
+        response = requests.get(url, timeout=10)
+
+        data = response.json()
+
+        movie = data
+
+        poster_path = movie.get("poster_path")
+
+        poster_url = None
+        if poster_path:
+            poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
+
+        return jsonify({
+            "title": movie.get("title"),
+            "overview": movie.get("overview"),
+            "release_date": movie.get("release_date"),
+            "rating": movie.get("vote_average"),
+            "poster": poster_url
+        })
+
+    except Exception as e:
+        print("Movie details error:", e)
+        return jsonify({"error": "Server error"}), 500
+
+print(movies.columns)
+print(movies[['title','movie_id']].head(5))
 if __name__ == "__main__":
     app.run(debug=True)
