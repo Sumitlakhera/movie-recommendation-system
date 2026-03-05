@@ -11,7 +11,7 @@ similarity = pickle.load(open("similarity.pkl", "rb"))
 
 def recommend(movie):
 
-    movie_index = movies[movies['title'] == movie].index[0]
+    movie_index = movies[movies['title'].str.lower() == movie.lower()].index[0]
 
     distances = similarity[movie_index]
 
@@ -33,8 +33,12 @@ def recommend_movies():
 
     movie = request.args.get("movie")
 
-    if movie not in movies["title"].values:
+    match = movies[movies['title'].str.lower() == movie.lower()]
+
+    if match.empty:
         return jsonify({"error": "Movie not found"}), 404
+
+    movie_index = match.index[0]
 
     recommendations = recommend(movie)
 
