@@ -157,8 +157,15 @@ def movie_details():
         })
 
     except Exception as e:
-        print("Movie details error:", e)
-        return jsonify({"error": "Server error"}), 500
+     print("Movie details error:", e)
+
+     return jsonify({
+        "title": "Unknown Movie",
+        "overview": "Movie details are currently unavailable.",
+        "release_date": "Unknown",
+        "rating": "N/A",
+        "poster": None
+     })
 
 print(movies.columns)
 print(movies[['title','movie_id']].head(5))
