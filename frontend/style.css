@@ -38,18 +38,27 @@ body {
 }
 
 .movies-grid {
-    margin-top: 30px;
+    margin-top: 40px;
     display: grid;
     grid-template-columns: repeat(auto-fill, 200px);
-    gap: 20px;
+    gap: 25px;
 }
 
 .movie-card {
     background-color: #222;
-    padding: 15px;
-    border-radius: 6px;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+}
+
+.movie-card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
 }
 
 .movie-title {
+    padding: 12px;
     font-size: 14px;
+    text-align: center;
 }
