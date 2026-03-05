@@ -6,6 +6,7 @@ const App = () => {
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   const handleSearch = () => {
 
@@ -116,24 +117,66 @@ const App = () => {
       { className: "movies-grid" },
 
       results.map((movie, index) =>
-        
         React.createElement(
           "div",
-          { className: "movie-card", key: index },
+          {
+            className: "movie-card",
+            key: index,
+            onClick: () => setSelectedMovie(movie)
+          },
 
-         React.createElement("img", {
-            src: movie.poster ? movie.poster : "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available",
+          React.createElement("img", {
+            src: movie.poster
+              ? movie.poster
+              : "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available",
             className: "poster",
             onError: (e) => {
-                e.target.onerror = null;
-                e.target.src = "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available";
+              e.target.onerror = null;
+              e.target.src =
+                "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available";
             }
           }),
 
-          React.createElement("div", { className: "movie-title" }, movie.title),
+          React.createElement("div", { className: "movie-title" }, movie.title)
+        )
+      )
+    ),
+
+selectedMovie &&
+  React.createElement(
+    "div",
+    { className: "modal-overlay",
+        onClick: () => setSelectedMovie(null)
+     },
+
+    React.createElement(
+      "div",
+      { className: "modal-content",
+        onClick: (e) => e.stopPropagation()
+      },
+
+      React.createElement("img", {
+        src: selectedMovie.poster || "./no-poster.png",
+        className: "modal-poster"
+      }),
+
+      React.createElement(
+        "div",
+        { className: "modal-info" },
+
+        React.createElement("h2", null, selectedMovie.title),
+
+        React.createElement(
+          "button",
+          {
+            className: "close-button",
+            onClick: () => setSelectedMovie(null)
+          },
+          "Close"
         )
       )
     )
+   )
   );
 };
 
