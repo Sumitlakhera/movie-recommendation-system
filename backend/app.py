@@ -8,6 +8,8 @@ TMDB_API_KEY = "6a81b7e4a3680f5b37a647ccf3726035"
 app = Flask(__name__)
 CORS(app)
 
+tmdb_cache = {}
+
 # Load saved model files
 movies = pickle.load(open("movies.pkl", "rb"))
 similarity = pickle.load(open("similarity.pkl", "rb"))
@@ -129,6 +131,10 @@ def movie_details():
 
     movie_id = request.args.get("id")
 
+    # Check cache first
+    if movie_id in tmdb_cache:
+        return jsonify(tmdb_cache[movie_id])
+
     if not movie_id:
         return jsonify({"error": "No movie_id provided"}), 400
 
@@ -148,13 +154,18 @@ def movie_details():
         if poster_path:
             poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
 
-        return jsonify({
+        movie_data = {
             "title": movie.get("title"),
             "overview": movie.get("overview"),
             "release_date": movie.get("release_date"),
             "rating": movie.get("vote_average"),
             "poster": poster_url
-        })
+        }
+
+        # Save in cache
+        tmdb_cache[movie_id] = movie_data
+
+        return jsonify(movie_data)
 
     except Exception as e:
      print("Movie details error:", e)
