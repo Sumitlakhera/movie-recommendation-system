@@ -5,25 +5,39 @@ const App = () => {
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = () => {
-    fetch(`http://127.0.0.1:5000/recommend?movie=${movie}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          setResults([]);
-          setError("No results found");
-        } else {
-          setResults(data.recommendations);
-          setError("");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
+
+  if (!movie) return;
+
+  setLoading(true);
+  setResults([]);
+  setError("");
+
+  fetch(`http://127.0.0.1:5000/recommend?movie=${movie}`)
+    .then((response) => response.json())
+    .then((data) => {
+
+      setLoading(false);
+
+      if (data.error) {
         setResults([]);
-        setError("Something went wrong");
-      });
-  };
+        setError("No results found");
+      } else {
+        setResults(data.recommendations);
+      }
+
+    })
+    .catch((error) => {
+
+      console.error(error);
+      setLoading(false);
+      setResults([]);
+      setError("Something went wrong");
+
+    });
+};
 
   return React.createElement(
     "div",
@@ -91,7 +105,13 @@ const App = () => {
       ),
     ),
 
-    React.createElement(
+    loading
+  ? React.createElement(
+      "div",
+      { className: "spinner" },
+      "Loading recommendations..."
+    )
+  : React.createElement(
       "div",
       { className: "movies-grid" },
 
@@ -106,9 +126,9 @@ const App = () => {
           }),
 
           React.createElement("div", { className: "movie-title" }, movie.title),
-        ),
-      ),
-    ),
+        )
+      )
+    )
   );
 };
 
