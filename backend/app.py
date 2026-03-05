@@ -9,6 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 tmdb_cache = {}
+poster_cache = {}
 
 # Load saved model files
 movies = pickle.load(open("movies.pkl", "rb"))
@@ -45,20 +46,31 @@ def recommend(movie):
 
 def fetch_poster(movie_id):
 
+    # Check poster cache first
+    if movie_id in poster_cache:
+        return poster_cache[movie_id]
+
     try:
 
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
 
         response = requests.get(url, timeout=10)
 
+        if response.status_code != 200:
+            return None
+
         data = response.json()
 
         poster_path = data.get("poster_path")
 
+        poster_url = None
         if poster_path:
-            return f"https://image.tmdb.org/t/p/w500{poster_path}"
+            poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
 
-        return None
+        # Save result in cache
+        poster_cache[movie_id] = poster_url
+
+        return poster_url
 
     except Exception as e:
         print("TMDB poster error:", e)
