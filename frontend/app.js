@@ -100,7 +100,12 @@ const App = () => {
           "div",
           { className: "movie-card", key: index },
 
-          React.createElement("div", { className: "movie-title" }, movie),
+          React.createElement("img", {
+            src: movie.poster || "https://via.placeholder.com/300x450?text=No+Poster",
+            className: "poster",
+          }),
+
+          React.createElement("div", { className: "movie-title" }, movie.title),
         ),
       ),
     ),

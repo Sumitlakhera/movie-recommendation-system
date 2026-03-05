@@ -1,6 +1,9 @@
 import pickle
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests
+
+TMDB_API_KEY = "6a81b7e4a3680f5b37a647ccf3726035"
 
 app = Flask(__name__)
 CORS(app)
@@ -8,6 +11,7 @@ CORS(app)
 # Load saved model files
 movies = pickle.load(open("movies.pkl", "rb"))
 similarity = pickle.load(open("similarity.pkl", "rb"))
+
 
 def recommend(movie):
 
@@ -24,9 +28,39 @@ def recommend(movie):
     recommendations = []
 
     for i in movies_list:
-        recommendations.append(movies.iloc[i[0]].title)
+
+        title = movies.iloc[i[0]].title
+
+        poster = fetch_poster(title)
+
+        recommendations.append({
+        "title": title,
+        "poster": poster
+    })
 
     return recommendations
+
+def fetch_poster(movie_title):
+
+    try:
+
+        url = f"https://api.themoviedb.org/3/search/movie?api_key={TMDB_API_KEY}&query={movie_title}"
+
+        response = requests.get(url, timeout=5)
+
+        data = response.json()
+
+        if data.get("results"):
+
+            poster_path = data["results"][0].get("poster_path")
+
+            if poster_path:
+                return f"https://image.tmdb.org/t/p/w500{poster_path}"
+
+    except Exception as e:
+        print("TMDB error:", e)
+
+    return ""
 
 @app.route("/recommend", methods=["GET"])
 def recommend_movies():
