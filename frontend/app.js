@@ -3,25 +3,49 @@ const { useState } = React;
 const App = () => {
   const [movie, setMovie] = useState("");
   const [results, setResults] = useState([]);
+  const [error, setError] = useState("");
 
   const handleSearch = () => {
+
     fetch(`http://127.0.0.1:5000/recommend?movie=${movie}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.recommendations) {
-          setResults(data.recommendations);
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.error) {
+
+            setResults([]);
+            setError("No results found");
+
+        } else {
+
+            setResults(data.recommendations);
+            setError("");
+
         }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
+
+    })
+    .catch(error => {
+
+        console.error(error);
+        setResults([]);
+        setError("Something went wrong");
+
+    });
+
+};
 
   return React.createElement(
     "div",
     { className: "container" },
 
     React.createElement("div", { className: "header" }, "Movie Recommender"),
+
+    error &&
+    React.createElement(
+    "div",
+    { className: "error-message" },
+    error
+    ),
 
     React.createElement(
       "div",
