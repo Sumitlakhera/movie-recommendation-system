@@ -35,7 +35,7 @@ def recommend(movie):
 
         recommendations.append({
         "title": title,
-        "poster": poster
+        "poster": poster if poster else None
     })
 
     return recommendations
@@ -48,19 +48,26 @@ def fetch_poster(movie_title):
 
         response = requests.get(url, timeout=5)
 
+        if response.status_code != 200:
+            return None
+
         data = response.json()
 
-        if data.get("results"):
+        results = data.get("results")
 
-            poster_path = data["results"][0].get("poster_path")
+        if not results:
+            return None
 
-            if poster_path:
-                return f"https://image.tmdb.org/t/p/w500{poster_path}"
+        poster_path = results[0].get("poster_path")
+
+        if not poster_path:
+            return None
+
+        return f"https://image.tmdb.org/t/p/w500{poster_path}"
 
     except Exception as e:
         print("TMDB error:", e)
-
-    return ""
+        return None
 
 @app.route("/recommend", methods=["GET"])
 def recommend_movies():

@@ -116,13 +116,18 @@ const App = () => {
       { className: "movies-grid" },
 
       results.map((movie, index) =>
+        
         React.createElement(
           "div",
           { className: "movie-card", key: index },
 
-          React.createElement("img", {
-            src: movie.poster || "https://via.placeholder.com/300x450?text=No+Poster",
+         React.createElement("img", {
+            src: movie.poster ? movie.poster : "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available",
             className: "poster",
+            onError: (e) => {
+                e.target.onerror = null;
+                e.target.src = "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available";
+            }
           }),
 
           React.createElement("div", { className: "movie-title" }, movie.title),
