@@ -45,16 +45,34 @@ body {
 }
 
 .movie-card {
+    position: relative;
     background-color: #222;
     border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
 
+.movie-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.0);
+    transition: background 0.3s ease;
+}
+
+.movie-card:hover::before {
+    background: rgba(0,0,0,0.35);
+}
+
 .movie-card:hover {
-    transform: scale(1.08);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+    transform: scale(1.12);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    z-index: 5;
+}
+
+.movie-card:hover .movie-title {
+    opacity: 1;
 }
 
 .movie-card:hover .poster {
@@ -62,9 +80,15 @@ body {
 }
 
 .movie-title {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
     padding: 12px;
     font-size: 14px;
     text-align: center;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .error-message {
