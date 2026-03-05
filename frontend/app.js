@@ -7,16 +7,20 @@ const App = () => {
 
     const handleSearch = () => {
 
-        console.log("Search movie:", movie);
+    fetch(`http://127.0.0.1:5000/recommend?movie=${movie}`)
+    .then(response => response.json())
+    .then(data => {
 
-        // placeholder results
-        setResults([
-            "Example Movie 1",
-            "Example Movie 2",
-            "Example Movie 3"
-        ]);
+        if (data.recommendations) {
+            setResults(data.recommendations);
+        }
 
-    };
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+
+};
 
     return (
 
