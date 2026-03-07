@@ -1,4 +1,4 @@
-const { useState } = React;
+const { useState, useRef } = React;
 
 const App = () => {
     const [movie, setMovie] = useState("");
@@ -8,6 +8,7 @@ const App = () => {
     const [loading, setLoading] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [movieDetails, setMovieDetails] = useState(null);
+    const inputRef = useRef(null);
 
     const handleSearch = () => {
 
@@ -73,9 +74,16 @@ const App = () => {
                     { className: "search-box" },
 
                     React.createElement("input", {
+                        ref: inputRef,
                         className: "search-bar",
                         placeholder: "Enter movie name...",
                         value: movie,
+                        onKeyDown: (e) => {
+                            
+                            if (e.key === "Enter") {
+                                handleSearch();
+                            }
+                        },
                         onChange: (e) => {
                             const value = e.target.value;
                             setMovie(value);
@@ -104,6 +112,9 @@ const App = () => {
                                     onClick: () => {
                                         setMovie(title);
                                         setSuggestions([]);
+                                        if (inputRef.current) {
+                                            inputRef.current.focus();
+                                        }
                                     },
                                 },
                                 title
