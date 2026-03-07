@@ -122,6 +122,13 @@ const App = () => {
                 )
             ),
 
+            results.length > 0 &&
+            React.createElement(
+                "div",
+                { className: "section-title" },
+                "Recommended Movies"
+            ),
+
             loading
                 ? React.createElement(
                     "div",

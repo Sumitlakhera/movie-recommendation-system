@@ -152,7 +152,7 @@ def movie_details():
 
     try:
 
-        url = url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
 
         response = requests.get(url, timeout=10)
 
