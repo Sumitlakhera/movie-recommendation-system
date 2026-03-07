@@ -143,9 +143,21 @@ const App = () => {
             loading
                 ? React.createElement(
                     "div",
-                    { className: "spinner" },
-                    "Loading recommendations..."
-                )
+                    { className: "movies-grid" },
+                    Array.from({ length: 5 }).map((_, index) =>
+
+                        React.createElement(
+                            "div",
+                            {
+                            key: index,
+                            className: "movie-card"
+                            },
+                            React.createElement("div", {
+                            key: index,
+                            className: "poster skeleton-card"
+                        })
+                    )
+                ))
                 : React.createElement(
                     "div",
                     { className: "movies-grid" },

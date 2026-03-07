@@ -47,7 +47,7 @@ body {
     display: flex;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 25px;
-    margin-top: 40px;
+    margin-top: 20px;
     justify-items: center;
 }
 
@@ -253,7 +253,7 @@ body {
     font-size: 26px;
     font-weight: 600;
     margin-top: 40px;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
     color: #ffffff;
     letter-spacing: 0.5px;
     width: 100%;
@@ -269,4 +269,27 @@ body {
     background: #e50914;
     margin-top: 8px;
     border-radius: 2px;
+}
+
+.skeleton-card {
+    width: 220px;
+    height: 270px;
+    border-radius: 10px;
+    background: linear-gradient(
+        90deg,
+        #1f1f1f 25%,
+        #2a2a2a 50%,
+        #1f1f1f 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.4s infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
 }
