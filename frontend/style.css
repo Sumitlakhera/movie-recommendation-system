@@ -18,6 +18,7 @@ body {
     max-width: 1200px;
     margin: auto;
     padding: 40px 20px;
+    scroll-behavior: smooth;
 }
 
 .search-bar {
@@ -292,4 +293,21 @@ body {
     100% {
         background-position: -200% 0;
     }
+}
+
+.trending-row {
+    display: flex;
+    gap: 25px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
+
+.trending-row::-webkit-scrollbar {
+    display: none;
+}
+
+.trending-row .movie-card {
+    flex: 0 0 auto;
 }

@@ -1,4 +1,4 @@
-const { useState, useRef } = React;
+const { useState, useRef, useEffect } = React;
 
 const App = () => {
     const [movie, setMovie] = useState("");
@@ -8,7 +8,19 @@ const App = () => {
     const [loading, setLoading] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [movieDetails, setMovieDetails] = useState(null);
+    const [trending, setTrending] = useState([]);
     const inputRef = useRef(null);
+
+    useEffect(() => {
+
+        fetch("http://127.0.0.1:5000/trending")
+            .then(res => res.json())
+            .then(data => {
+                setTrending(data);
+            })
+            .catch(err => console.error("Trending fetch error:", err));
+
+    }, []);
 
     const handleSearch = () => {
 
@@ -79,7 +91,7 @@ const App = () => {
                         placeholder: "Enter movie name...",
                         value: movie,
                         onKeyDown: (e) => {
-                            
+
                             if (e.key === "Enter") {
                                 handleSearch();
                             }
@@ -132,135 +144,172 @@ const App = () => {
                     "Recommend"
                 )
             ),
+        ),
 
-            results.length > 0 &&
-            React.createElement(
-                "div",
-                { className: "section-title" },
-                "Recommended Movies"
-            ),
+        trending.length > 0 &&
+        React.createElement(
+            "div",
+            { className: "section-title" },
+            "Trending Movies"
+        ),
 
-            loading
-                ? React.createElement(
+        React.createElement(
+            "div",
+            { className: "trending-row" },
+
+            trending.map((movie, index) =>
+                React.createElement(
                     "div",
-                    { className: "movies-grid" },
-                    Array.from({ length: 5 }).map((_, index) =>
+                    {
+                        key: index,
+                        className: "movie-card"
+                    },
 
-                        React.createElement(
-                            "div",
-                            {
+                    React.createElement("img", {
+                        src: movie.poster
+                            ? movie.poster
+                            : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
+                        className: "poster"
+                    }),
+
+                    React.createElement(
+                        "div",
+                        { className: "movie-title" },
+                        movie.title
+                    )
+                )
+            )
+        ),
+
+
+        results.length > 0 &&
+        React.createElement(
+            "div",
+            { className: "section-title" },
+            "Recommended Movies"
+        ),
+
+        loading
+            ? React.createElement(
+                "div",
+                { className: "movies-grid" },
+                Array.from({ length: 5 }).map((_, index) =>
+
+                    React.createElement(
+                        "div",
+                        {
                             key: index,
                             className: "movie-card"
-                            },
-                            React.createElement("div", {
+                        },
+                        React.createElement("div", {
                             key: index,
                             className: "poster skeleton-card"
                         })
                     )
                 ))
-                : React.createElement(
-                    "div",
-                    { className: "movies-grid" },
+            : React.createElement(
+                "div",
+                { className: "movies-grid" },
 
-                    results.map((movie, index) =>
-                        React.createElement(
-                            "div",
-                            {
-                                className: "movie-card",
-                                key: index,
-                                onClick: () => {
-                                    fetch(`http://127.0.0.1:5000/movie-details?id=${movie.movie_id}`)
-                                        .then(res => res.json())
-                                        .then(data => {
-                                            setMovieDetails(data)
-                                            setSelectedMovie(movie);
-                                        })
-                                }
-                            },
+                results.map((movie, index) =>
+                    React.createElement(
+                        "div",
+                        {
+                            className: "movie-card",
+                            key: index,
+                            onClick: () => {
+                                fetch(`http://127.0.0.1:5000/movie-details?id=${movie.movie_id}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        setMovieDetails(data)
+                                        setSelectedMovie(movie);
+                                    })
+                            }
+                        },
 
-                            React.createElement("img", {
-                                src: movie.poster
-                                    ? movie.poster
-                                    : "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available",
-                                className: "poster",
-                                onError: (e) => {
-                                    e.target.onerror = null;
-                                    e.target.src =
-                                        "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available";
-                                }
-                            }),
+                        React.createElement("img", {
+                            src: movie.poster
+                                ? movie.poster
+                                : "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available",
+                            className: "poster",
+                            onError: (e) => {
+                                e.target.onerror = null;
+                                e.target.src =
+                                    "https://dummyimage.com/300x450/222/fff&text=No+Poster+Available";
+                            }
+                        }),
 
-                            React.createElement("div", { className: "movie-title" }, movie.title)
-                        )
+                        React.createElement("div", { className: "movie-title" }, movie.title)
                     )
-                ),
+                )
+            ),
 
-            selectedMovie &&
+        selectedMovie &&
+        React.createElement(
+            "div",
+            {
+                className: "modal-overlay",
+                onClick: () => setSelectedMovie(null)
+            },
+
             React.createElement(
                 "div",
                 {
-                    className: "modal-overlay",
-                    onClick: () => setSelectedMovie(null)
+                    className: "modal-content",
+                    onClick: (e) => e.stopPropagation()
                 },
+
+                React.createElement("img", {
+                    src: selectedMovie.poster || "./no-poster.png",
+                    className: "modal-poster"
+                }),
 
                 React.createElement(
                     "div",
-                    {
-                        className: "modal-content",
-                        onClick: (e) => e.stopPropagation()
-                    },
-
-                    React.createElement("img", {
-                        src: selectedMovie.poster || "./no-poster.png",
-                        className: "modal-poster"
-                    }),
+                    { className: "modal-info" },
 
                     React.createElement(
-                        "div",
-                        { className: "modal-info" },
+                        "h2",
+                        null,
+                        movieDetails ? movieDetails.title : selectedMovie.title
+                    ),
 
-                        React.createElement(
-                            "h2",
-                            null,
-                            movieDetails ? movieDetails.title : selectedMovie.title
-                        ),
+                    movieDetails &&
+                    React.createElement(
+                        "p",
+                        null,
+                        movieDetails.overview
+                    ),
 
-                        movieDetails &&
-                        React.createElement(
-                            "p",
-                            null,
-                            movieDetails.overview
-                        ),
+                    movieDetails &&
+                    React.createElement(
+                        "p",
+                        null,
+                        "Release: " + movieDetails.release_date
+                    ),
 
-                        movieDetails &&
-                        React.createElement(
-                            "p",
-                            null,
-                            "Release: " + movieDetails.release_date
-                        ),
+                    movieDetails &&
+                    React.createElement(
+                        "p",
+                        null,
+                        "Rating: " + movieDetails.rating
+                    ),
 
-                        movieDetails &&
-                        React.createElement(
-                            "p",
-                            null,
-                            "Rating: " + movieDetails.rating
-                        ),
-
-                        React.createElement(
-                            "button",
-                            {
-                                className: "close-button",
-                                onClick: () => {
-                                    setSelectedMovie(null);
-                                    setMovieDetails(null);
-                                }
-                            },
-                            "Close"
-                        )
+                    React.createElement(
+                        "button",
+                        {
+                            className: "close-button",
+                            onClick: () => {
+                                setSelectedMovie(null);
+                                setMovieDetails(null);
+                            }
+                        },
+                        "Close"
                     )
                 )
             )
         )
+
     );
 };
 

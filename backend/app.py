@@ -190,6 +190,45 @@ def movie_details():
         "poster": None
      })
 
+@app.route("/trending", methods=["GET"])
+def trending_movies():
+
+    try:
+
+        url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
+
+        response = requests.get(url, timeout=10)
+
+        data = response.json()
+
+        movies = []
+
+        results = data.get("results")
+
+        if results:
+            for movie in results[:10]:
+
+                poster = None
+
+                poster_path = movie.get("poster_path")
+
+                if poster_path:
+                    poster = f"https://image.tmdb.org/t/p/w500{poster_path}"
+
+                movies.append({
+                    "title": movie.get("title"),
+                    "movie_id": movie.get("id"),
+                    "poster": poster
+                })
+
+        return jsonify(movies)
+
+    except Exception as e:
+
+        print("Trending fetch error:", e)
+
+        return jsonify([])
+
 print(movies.columns)
 print(movies[['title','movie_id']].head(5))
 if __name__ == "__main__":
