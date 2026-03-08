@@ -9,6 +9,7 @@ const App = () => {
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [movieDetails, setMovieDetails] = useState(null);
     const [trending, setTrending] = useState([]);
+    const [trendingLoading, setTrendingLoading] = useState(true);
     const trendingRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -20,9 +21,12 @@ const App = () => {
             .then(res => res.json())
             .then(data => {
                 setTrending(data);
+                setTrendingLoading(false);
             })
-            .catch(err => console.error("Trending fetch error:", err));
-
+            .catch(err => {
+                console.error("Trending fetch error:", err);
+                setTrendingLoading(false);
+            });
     }, []);
 
     const scrollTrendingLeft = () => {
@@ -74,6 +78,10 @@ const App = () => {
 
             });
     };
+
+    const trendingItems = trendingLoading
+    ? Array.from({ length: 8 }, () => ({ skeleton: true }))
+    : trending;
 
     return React.createElement(
         "div",
@@ -167,7 +175,7 @@ const App = () => {
             ),
         ),
 
-        trending.length > 0 &&
+        (trendingLoading || trending.length > 0)&&
         React.createElement(
             "div",
             null,
@@ -194,7 +202,7 @@ const App = () => {
                     "div",
                     { className: "trending-row", ref: trendingRef },
 
-                    trending.map((movie, index) =>
+                    trendingItems.map((movie, index) =>
                         React.createElement(
                             "div",
                             {
@@ -202,13 +210,16 @@ const App = () => {
                                 className: "movie-card"
                             },
 
-                            React.createElement("img", {
+                            movie.skeleton
+                            ? React.createElement("div",{className: "poster skeleton-card"})
+                            : React.createElement("img", {
                                 src: movie.poster
                                     ? movie.poster
                                     : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
                                 className: "poster"
                             }),
 
+                            !movie.skeleton &&
                             React.createElement(
                                 "div",
                                 { className: "movie-title" },
@@ -216,6 +227,7 @@ const App = () => {
                             )
                         )
                     )
+                
                 ),
 
                 React.createElement(
