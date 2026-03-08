@@ -9,6 +9,7 @@ const App = () => {
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [movieDetails, setMovieDetails] = useState(null);
     const [trending, setTrending] = useState([]);
+    const trendingRef = useRef(null);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -21,6 +22,24 @@ const App = () => {
             .catch(err => console.error("Trending fetch error:", err));
 
     }, []);
+
+    const scrollTrendingLeft = () => {
+        if (trendingRef.current) {
+            trendingRef.current.scrollBy({
+                left: -400,
+                behavior: "smooth"
+            });
+        }
+    };
+
+    const scrollTrendingRight = () => {
+        if (trendingRef.current) {
+            trendingRef.current.scrollBy({
+                left: 400,
+                behavior: "smooth"
+            });
+        }
+    };
 
     const handleSearch = () => {
 
@@ -155,30 +174,51 @@ const App = () => {
 
         React.createElement(
             "div",
-            { className: "trending-row" },
+            { className: "trending-wrapper" },
 
-            trending.map((movie, index) =>
-                React.createElement(
-                    "div",
-                    {
-                        key: index,
-                        className: "movie-card"
-                    },
+            React.createElement("div", { className: "fade-left" }),
 
-                    React.createElement("img", {
-                        src: movie.poster
-                            ? movie.poster
-                            : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
-                        className: "poster"
-                    }),
+            React.createElement(
+                "button",
+                { className: "scroll-btn left", onClick: scrollTrendingLeft },
+                "❮"
+            ),
 
+            React.createElement(
+                "div",
+                { className: "trending-row", ref: trendingRef },
+
+                trending.map((movie, index) =>
                     React.createElement(
                         "div",
-                        { className: "movie-title" },
-                        movie.title
+                        {
+                            key: index,
+                            className: "movie-card"
+                        },
+
+                        React.createElement("img", {
+                            src: movie.poster
+                                ? movie.poster
+                                : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
+                            className: "poster"
+                        }),
+
+                        React.createElement(
+                            "div",
+                            { className: "movie-title" },
+                            movie.title
+                        )
                     )
                 )
-            )
+            ),
+
+            React.createElement(
+                "button",
+                { className: "scroll-btn right", onClick: scrollTrendingRight },
+                "❯"
+            ),
+
+            React.createElement("div", { className: "fade-right" })
         ),
 
 
