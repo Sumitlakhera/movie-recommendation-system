@@ -6,7 +6,7 @@ import requests
 TMDB_API_KEY = "6a81b7e4a3680f5b37a647ccf3726035"
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 tmdb_cache = {}
 poster_cache = {}
