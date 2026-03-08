@@ -12,9 +12,11 @@ const App = () => {
     const trendingRef = useRef(null);
     const inputRef = useRef(null);
 
+    const API_BASE = "http://127.0.0.1:5000";
+
     useEffect(() => {
 
-        fetch("http://127.0.0.1:5000/trending")
+        fetch(`${API_BASE}/trending`)
             .then(res => res.json())
             .then(data => {
                 setTrending(data);
@@ -49,7 +51,7 @@ const App = () => {
         setResults([]);
         setError("");
 
-        fetch(`http://127.0.0.1:5000/recommend?movie=${movie}`)
+        fetch(`${API_BASE}/recommend?movie=${movie}`)
             .then((response) => response.json())
             .then((data) => {
 
@@ -124,7 +126,7 @@ const App = () => {
                                 return;
                             }
 
-                            fetch(`http://127.0.0.1:5000/search?query=${value}`)
+                            fetch(`${API_BASE}/search?query=${value}`)
                                 .then((res) => res.json())
                                 .then((data) => setSuggestions(data));
                         },
@@ -168,57 +170,62 @@ const App = () => {
         trending.length > 0 &&
         React.createElement(
             "div",
-            { className: "section-title" },
-            "Trending Movies"
-        ),
-
-        React.createElement(
-            "div",
-            { className: "trending-wrapper" },
-
-            React.createElement("div", { className: "fade-left" }),
+            null,
 
             React.createElement(
-                "button",
-                { className: "scroll-btn left", onClick: scrollTrendingLeft },
-                "❮"
+                "div",
+                { className: "section-title" },
+                "Trending Movies"
             ),
 
             React.createElement(
                 "div",
-                { className: "trending-row", ref: trendingRef },
+                { className: "trending-wrapper" },
 
-                trending.map((movie, index) =>
-                    React.createElement(
-                        "div",
-                        {
-                            key: index,
-                            className: "movie-card"
-                        },
+                React.createElement("div", { className: "fade-left" }),
 
-                        React.createElement("img", {
-                            src: movie.poster
-                                ? movie.poster
-                                : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
-                            className: "poster"
-                        }),
+                React.createElement(
+                    "button",
+                    { className: "scroll-btn left", onClick: scrollTrendingLeft },
+                    "❮"
+                ),
 
+                React.createElement(
+                    "div",
+                    { className: "trending-row", ref: trendingRef },
+
+                    trending.map((movie, index) =>
                         React.createElement(
                             "div",
-                            { className: "movie-title" },
-                            movie.title
+                            {
+                                key: index,
+                                className: "movie-card"
+                            },
+
+                            React.createElement("img", {
+                                src: movie.poster
+                                    ? movie.poster
+                                    : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
+                                className: "poster"
+                            }),
+
+                            React.createElement(
+                                "div",
+                                { className: "movie-title" },
+                                movie.title
+                            )
                         )
                     )
-                )
-            ),
+                ),
 
-            React.createElement(
-                "button",
-                { className: "scroll-btn right", onClick: scrollTrendingRight },
-                "❯"
-            ),
+                React.createElement(
+                    "button",
+                    { className: "scroll-btn right", onClick: scrollTrendingRight },
+                    "❯"
+                ),
 
-            React.createElement("div", { className: "fade-right" })
+                React.createElement("div", { className: "fade-right" })
+            ),
         ),
 
 
@@ -258,7 +265,7 @@ const App = () => {
                             className: "movie-card",
                             key: index,
                             onClick: () => {
-                                fetch(`http://127.0.0.1:5000/movie-details?id=${movie.movie_id}`)
+                                fetch(`${API_BASE}/movie-details?id=${movie.movie_id}`)
                                     .then(res => res.json())
                                     .then(data => {
                                         setMovieDetails(data)
@@ -283,6 +290,7 @@ const App = () => {
                     )
                 )
             ),
+            
 
         selectedMovie &&
         React.createElement(
