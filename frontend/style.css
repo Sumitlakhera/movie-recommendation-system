@@ -66,6 +66,21 @@ body {
     transform-origin: center bottom;
 }
 
+.movie-card iframe {
+  width: 100%;
+  height: 270px;
+  border: none;
+  border-radius: 10px;
+  opacity: 0;
+  animation: videoFade 0.4s forwards;
+}
+
+@keyframes videoFade {
+  to {
+    opacity: 1;
+  }
+}
+
 .movie-card::before {
     content: "";
     position: absolute;
@@ -159,7 +174,7 @@ body {
     height: 270px;
     object-fit: cover;
     border-radius: 10px;
-    transition: transform 0.3s ease;
+    transition: opacity 0.35s ease;
 }
 
 .spinner {

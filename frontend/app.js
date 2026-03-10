@@ -10,8 +10,11 @@ const App = () => {
     const [movieDetails, setMovieDetails] = useState(null);
     const [trending, setTrending] = useState([]);
     const [trendingLoading, setTrendingLoading] = useState(true);
+    const [previewTrailer, setPreviewTrailer] = useState(null);
+    const hoverTimer = useRef(null);
     const trendingRef = useRef(null);
     const inputRef = useRef(null);
+    const trailerCache = useRef({});
 
     const API_BASE = "http://127.0.0.1:5000";
 
@@ -207,17 +210,74 @@ const App = () => {
                             "div",
                             {
                                 key: index,
-                                className: "movie-card"
+                                className: "movie-card",
+
+                                onMouseEnter: () => {
+                                    clearTimeout(hoverTimer.current);
+
+                                    if (movie.skeleton) return;
+
+                                    hoverTimer.current = setTimeout(() => {
+
+                                        const cachedTrailer = trailerCache.current[movie.movie_id];
+                                        if (cachedTrailer) {
+
+                                            setPreviewTrailer({
+                                                id: movie.movie_id,
+                                                url: cachedTrailer
+                                            });
+
+                                        } else {
+
+                                            fetch(`${API_BASE}/trailer?id=${movie.movie_id}`)
+                                                .then(res => res.json())
+                                                .then(data => {
+
+                                                    if (data.trailer) {
+
+                                                        trailerCache.current[movie.movie_id] = data.trailer;
+
+                                                        setPreviewTrailer({
+                                                            id: movie.movie_id,
+                                                            url: data.trailer
+                                                        });
+
+                                                    }
+
+                                                });
+
+                                        }
+
+                                    }, 3000);
+                                },
+
+                                onMouseLeave: () => {
+
+                                    clearTimeout(hoverTimer.current);
+                                    setPreviewTrailer(null);
+                                }
                             },
 
                             movie.skeleton
                                 ? React.createElement("div", { className: "poster skeleton-card" })
-                                : React.createElement("img", {
-                                    src: movie.poster
-                                        ? movie.poster
-                                        : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
-                                    className: "poster"
-                                }),
+
+                                : previewTrailer && previewTrailer.id === movie.movie_id
+
+                                    ? React.createElement("iframe", {
+                                        src: previewTrailer.url,
+                                        className: "poster",
+                                        frameBorder: "0",
+                                        allow: "autoplay",
+                                        allowFullScreen: false,
+                                        loading: "lazy"
+                                    })
+
+                                    : React.createElement("img", {
+                                        src: movie.poster
+                                            ? movie.poster
+                                            : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
+                                        className: "poster"
+                                    }),
 
                             !movie.skeleton &&
                             React.createElement(

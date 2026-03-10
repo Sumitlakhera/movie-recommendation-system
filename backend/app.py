@@ -228,6 +228,32 @@ def trending_movies():
         print("Trending fetch error:", e)
 
         return jsonify([])
+    
+
+@app.route("/trailer", methods=["GET"])
+def get_trailer():
+
+    movie_id = request.args.get("id")
+
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
+
+    try:
+        response = requests.get(url, timeout=10)
+        data = response.json()
+
+        results = data.get("results", [])
+
+        for video in results:
+            if video.get("type") == "Trailer" and video.get("site") == "YouTube":
+                return jsonify({
+                    "trailer": f"https://www.youtube.com/embed/{video['key']}?autoplay=1&mute=1&start=25&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
+                })
+
+        return jsonify({"trailer": None})
+
+    except Exception as e:
+        print("Trailer fetch error:", e)
+        return jsonify({"trailer": None})   
 
 print(movies.columns)
 print(movies[['title','movie_id']].head(5))
