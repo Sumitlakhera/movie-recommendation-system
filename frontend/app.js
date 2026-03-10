@@ -212,6 +212,20 @@ const App = () => {
                                 key: index,
                                 className: "movie-card",
 
+                                onClick: () => {
+
+        if (movie.skeleton) return;
+
+        fetch(`${API_BASE}/movie-details?id=${movie.movie_id}`)
+            .then(res => res.json())
+            .then(data => {
+                setPreviewTrailer(null);
+                setMovieDetails(data);
+                setSelectedMovie(movie);
+            });
+
+    },
+
                                 onMouseEnter: () => {
                                     clearTimeout(hoverTimer.current);
 

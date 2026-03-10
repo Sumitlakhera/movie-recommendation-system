@@ -73,6 +73,7 @@ body {
   border-radius: 10px;
   opacity: 0;
   animation: videoFade 0.4s forwards;
+  pointer-events: none;
 }
 
 @keyframes videoFade {
