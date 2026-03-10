@@ -80,8 +80,8 @@ const App = () => {
     };
 
     const trendingItems = trendingLoading
-    ? Array.from({ length: 8 }, () => ({ skeleton: true }))
-    : trending;
+        ? Array.from({ length: 8 }, () => ({ skeleton: true }))
+        : trending;
 
     return React.createElement(
         "div",
@@ -175,7 +175,7 @@ const App = () => {
             ),
         ),
 
-        (trendingLoading || trending.length > 0)&&
+        (trendingLoading || trending.length > 0) &&
         React.createElement(
             "div",
             null,
@@ -211,13 +211,13 @@ const App = () => {
                             },
 
                             movie.skeleton
-                            ? React.createElement("div",{className: "poster skeleton-card"})
-                            : React.createElement("img", {
-                                src: movie.poster
-                                    ? movie.poster
-                                    : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
-                                className: "poster"
-                            }),
+                                ? React.createElement("div", { className: "poster skeleton-card" })
+                                : React.createElement("img", {
+                                    src: movie.poster
+                                        ? movie.poster
+                                        : "https://dummyimage.com/300x450/222/fff&text=No+Poster",
+                                    className: "poster"
+                                }),
 
                             !movie.skeleton &&
                             React.createElement(
@@ -227,7 +227,7 @@ const App = () => {
                             )
                         )
                     )
-                
+
                 ),
 
                 React.createElement(
@@ -302,7 +302,7 @@ const App = () => {
                     )
                 )
             ),
-            
+
 
         selectedMovie &&
         React.createElement(

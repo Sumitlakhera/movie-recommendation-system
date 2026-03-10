@@ -184,12 +184,9 @@ body {
   height: 100%;
 
   background: rgba(0,0,0,0.6);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
   animation: overlayFade 0.25s ease;
+  backdrop-filter: blur(3px);
 }
 
 @keyframes overlayFade {
@@ -201,31 +198,51 @@ body {
   }
 }
 
+.modal-overlay .modal-content {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
 .modal-content {
+  position: fixed;
+
   background: #222;
   border-radius: 10px;
   padding: 20px;
+
   display: flex;
   gap: 20px;
-  max-width: 700px;
-  animation: modalExpand 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  width: 700px;
+  max-width: 90vw;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+
+  animation: modalPop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-@keyframes modalExpand {
+@keyframes modalPop {
+
   0% {
-    transform: scale(0.75);
+    transform: translate(-50%, -50%) scale(0.75);
     opacity: 0;
   }
 
   60% {
-    transform: scale(1.06);
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 1;
   }
 
   100% {
-    transform: scale(1);
-    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
+
 }
+
 
 .modal-poster {
   width: 200px;
@@ -235,6 +252,8 @@ body {
 .modal-info {
   display: flex;
   flex-direction: column;
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 .modal-info p {
