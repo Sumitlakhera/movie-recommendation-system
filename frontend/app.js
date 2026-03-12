@@ -4,6 +4,7 @@ const App = () => {
     const [movie, setMovie] = useState("");
     const [results, setResults] = useState([]);
     const [error, setError] = useState("");
+    const [searchedMovie, setSearchedMovie] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -27,7 +28,7 @@ const App = () => {
                 setTrendingLoading(false);
             })
             .catch(err => {
-                console.error("Trending fetch error:", err);
+
                 setTrendingLoading(false);
             });
     }, []);
@@ -66,8 +67,10 @@ const App = () => {
 
                 if (data.error) {
                     setResults([]);
+                    setSearchedMovie(null);
                     setError("No results found");
                 } else {
+                    setSearchedMovie(data.searched_movie);
                     setResults(data.recommendations);
                 }
 
@@ -85,6 +88,17 @@ const App = () => {
     const trendingItems = trendingLoading
         ? Array.from({ length: 8 }, () => ({ skeleton: true }))
         : trending;
+
+
+    const formatRuntime = (minutes) => {
+
+        if (!minutes) return "";
+
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+
+        return `${hours}h ${mins}m`;
+    };
 
     return React.createElement(
         "div",
@@ -312,6 +326,47 @@ const App = () => {
 
                 React.createElement("div", { className: "fade-right" })
             ),
+        ),
+
+        searchedMovie &&
+        React.createElement(
+            "div",
+            { className: "searched-movie-hero" },
+
+            React.createElement("img", {
+                src: searchedMovie.poster,
+                className: "hero-poster"
+            }),
+
+            React.createElement(
+                "div",
+                { className: "hero-info" },
+
+                React.createElement(
+                    "h2",
+                    { className: "hero-title" },
+                    searchedMovie.title
+                ),
+
+                React.createElement(
+                    "p",
+                    { className: "hero-meta" },
+                    `${searchedMovie.genres?.join(", ")} • ${formatRuntime(searchedMovie.runtime)}`
+                ),
+
+                searchedMovie.tagline &&
+                React.createElement(
+                    "p",
+                    { className: "hero-tagline" },
+                    searchedMovie.tagline
+                ),
+
+                React.createElement(
+                    "p",
+                    { className: "hero-overview" },
+                    searchedMovie.overview
+                )
+            )
         ),
 
 

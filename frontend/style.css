@@ -426,3 +426,43 @@ body {
     right: 0;
     background: linear-gradient(to left, #141414, transparent);
 }
+
+/*-----------------------------*/
+
+.searched-movie-hero {
+  display: flex;
+  gap: 30px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  align-items: flex-start;
+}
+
+.hero-poster {
+  width: 200px;
+  border-radius: 10px;
+}
+
+.hero-info {
+  max-width: 700px;
+}
+
+.hero-title {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.hero-meta {
+  color: #aaa;
+  margin-bottom: 10px;
+}
+
+.hero-tagline {
+  font-style: italic;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+.hero-overview {
+  color: #ddd;
+  line-height: 1.5;
+}

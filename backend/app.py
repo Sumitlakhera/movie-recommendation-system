@@ -88,18 +88,24 @@ def fetch_movie_details(movie_id):
             return None
 
         data = response.json()
+        genres = [g["name"] for g in data.get("genres", [])]
+        runtime = data.get("runtime")
+        tagline = data.get("tagline")
 
         poster = None
         if data.get("poster_path"):
             poster = f"https://image.tmdb.org/t/p/w500{data['poster_path']}"
 
         return {
-            "title": data.get("title"),
-            "overview": data.get("overview"),
-            "release_date": data.get("release_date"),
-            "rating": data.get("vote_average"),
-            "poster": poster
-        }
+    "title": data.get("title"),
+    "overview": data.get("overview"),
+    "release_date": data.get("release_date"),
+    "rating": data.get("vote_average"),
+    "poster": poster,
+    "genres": genres,
+    "runtime": runtime,
+    "tagline": tagline
+}
 
     except Exception as e:
         print("TMDB error:", e)
@@ -117,11 +123,15 @@ def recommend_movies():
 
     movie_index = match.index[0]
 
+    movie_id = int(movies.iloc[movie_index].movie_id)
+
+    searched_movie = fetch_movie_details(movie_id)
+
     recommendations = recommend(movie)
 
     return jsonify({
-        "input_movie": movie,
-        "recommendations": recommendations
+         "searched_movie": searched_movie,
+         "recommendations": recommendations
     })
 
 @app.route("/search", methods=["GET"])
