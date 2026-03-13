@@ -430,39 +430,110 @@ body {
 /*-----------------------------*/
 
 .searched-movie-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 50px;
+  margin-top: 40px;
+  border-radius: 16px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(20,20,20,0.95) 0%,
+    rgba(20,20,20,0.85) 40%,
+    rgba(20,20,20,0.6) 70%,
+    rgba(20,20,20,0.3) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
   display: flex;
   gap: 30px;
-  margin-top: 40px;
-  margin-bottom: 40px;
-  align-items: flex-start;
+  z-index: 2;
 }
 
 .hero-poster {
-  width: 200px;
+  width: 220px;
   border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-poster:hover {
+  transform: scale(1.05);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.9);
 }
 
 .hero-info {
-  max-width: 700px;
+  max-width: 650px;
 }
 
 .hero-title {
-  font-size: 32px;
-  margin-bottom: 10px;
+  font-size: 36px;
+  margin-bottom: 12px;
 }
 
 .hero-meta {
-  color: #aaa;
+  display: flex;
+  gap: 15px;
+  align-items: center;
   margin-bottom: 10px;
+}
+
+.rating-badge {
+  background: #e50914;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.genre-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.genre-pill {
+  background: rgba(255,255,255,0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
 }
 
 .hero-tagline {
   font-style: italic;
   color: #ccc;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .hero-overview {
   color: #ddd;
   line-height: 1.5;
+}
+
+.trailer-button {
+  margin-top: 15px;
+  padding: 10px 18px;
+  background: #e50914;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.trailer-button:hover {
+  transform: scale(1.05);
+  background: #ff1f2e;
 }

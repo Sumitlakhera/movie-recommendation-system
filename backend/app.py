@@ -95,17 +95,22 @@ def fetch_movie_details(movie_id):
         poster = None
         if data.get("poster_path"):
             poster = f"https://image.tmdb.org/t/p/w500{data['poster_path']}"
+        
+        backdrop = None
+        if data.get("backdrop_path"):
+            backdrop = f"https://image.tmdb.org/t/p/original{data['backdrop_path']}"
 
         return {
-    "title": data.get("title"),
-    "overview": data.get("overview"),
-    "release_date": data.get("release_date"),
-    "rating": data.get("vote_average"),
-    "poster": poster,
-    "genres": genres,
-    "runtime": runtime,
-    "tagline": tagline
-}
+            "title": data.get("title"),
+            "overview": data.get("overview"),
+            "release_date": data.get("release_date"),
+            "rating": data.get("vote_average"),
+            "poster": poster,
+            "backdrop": backdrop,
+            "genres": genres,
+            "runtime": runtime,
+            "tagline": tagline
+        }
 
     except Exception as e:
         print("TMDB error:", e)

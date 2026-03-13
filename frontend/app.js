@@ -331,40 +331,95 @@ const App = () => {
         searchedMovie &&
         React.createElement(
             "div",
-            { className: "searched-movie-hero" },
+            {
+                className: "searched-movie-hero",
+                style: {
+                    backgroundImage: `url(${searchedMovie.backdrop || searchedMovie.poster})`
+                }
+            },
 
-            React.createElement("img", {
-                src: searchedMovie.poster,
-                className: "hero-poster"
-            }),
+            React.createElement("div", { className: "hero-overlay" }),
 
             React.createElement(
                 "div",
-                { className: "hero-info" },
+                { className: "hero-content" },
+
+                React.createElement("img", {
+                    src: searchedMovie.poster,
+                    className: "hero-poster"
+                }),
 
                 React.createElement(
-                    "h2",
-                    { className: "hero-title" },
-                    searchedMovie.title
-                ),
+                    "div",
+                    { className: "hero-info" },
 
-                React.createElement(
-                    "p",
-                    { className: "hero-meta" },
-                    `${searchedMovie.genres?.join(", ")} • ${formatRuntime(searchedMovie.runtime)}`
-                ),
+                    React.createElement(
+                        "h2",
+                        { className: "hero-title" },
+                        `${searchedMovie.title} (${searchedMovie.release_date?.slice(0, 4)})`
+                    ),
 
-                searchedMovie.tagline &&
-                React.createElement(
-                    "p",
-                    { className: "hero-tagline" },
-                    searchedMovie.tagline
-                ),
+                    React.createElement(
+                        "div",
+                        { className: "hero-meta" },
 
-                React.createElement(
-                    "p",
-                    { className: "hero-overview" },
-                    searchedMovie.overview
+                        React.createElement(
+                            "span",
+                            { className: "rating-badge" },
+                            `⭐ ${searchedMovie.rating}`
+                        ),
+
+                        React.createElement(
+                            "span",
+                            null,
+                            formatRuntime(searchedMovie.runtime)
+                        )
+                    ),
+
+                    React.createElement(
+                        "div",
+                        { className: "genre-container" },
+                        searchedMovie.genres?.map((g, i) =>
+                            React.createElement(
+                                "span",
+                                { key: i, className: "genre-pill" },
+                                g
+                            )
+                        )
+                    ),
+
+                    React.createElement(
+                        "button",
+                        {
+                            className: "trailer-button",
+                            onClick: () => {
+                                fetch(`${API_BASE}/trailer?id=${movie.movie_id}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.trailer) {
+                                            setPreviewTrailer({
+                                                id: "hero",
+                                                url: data.trailer
+                                            });
+                                        }
+                                    });
+                            }
+                        },
+                        "▶ Play Trailer"
+                    ),
+
+                    searchedMovie.tagline &&
+                    React.createElement(
+                        "p",
+                        { className: "hero-tagline" },
+                        searchedMovie.tagline
+                    ),
+
+                    React.createElement(
+                        "p",
+                        { className: "hero-overview" },
+                        searchedMovie.overview
+                    )
                 )
             )
         ),
