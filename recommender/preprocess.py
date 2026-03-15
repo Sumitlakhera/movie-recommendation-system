@@ -1,5 +1,6 @@
 import pandas as pd
 import ast
+import json
 from nltk.stem.porter import PorterStemmer
 
 ps = PorterStemmer()
@@ -7,15 +8,12 @@ ps = PorterStemmer()
 
 def load_datasets():
 
-    movies = pd.read_csv("data/tmdb_5000_movies.csv")
-    credits = pd.read_csv("data/tmdb_5000_credits.csv")
+    movies = pd.read_csv("data/combined_movies.csv")
 
-    return movies, credits
+    return movies, None
 
 
 def merge_datasets(movies, credits):
-
-    movies = movies.merge(credits, on="title")
 
     return movies
 
@@ -31,7 +29,12 @@ def convert(text):
 
     result = []
 
-    for i in ast.literal_eval(text):
+    try:
+        data = json.loads(text)
+    except:
+        data = ast.literal_eval(text)
+
+    for i in data:
         result.append(i['name'])
 
     return result
@@ -41,9 +44,14 @@ def convert_cast(text):
 
     result = []
 
+    try:
+        data = json.loads(text)
+    except:
+        data = ast.literal_eval(text)
+
     counter = 0
 
-    for i in ast.literal_eval(text):
+    for i in data:
 
         if counter < 3:
             result.append(i['name'])
@@ -58,7 +66,12 @@ def fetch_director(text):
 
     result = []
 
-    for i in ast.literal_eval(text):
+    try:
+        data = json.loads(text)
+    except:
+        data = ast.literal_eval(text)
+
+    for i in data:
 
         if i['job'] == 'Director':
             result.append(i['name'])
