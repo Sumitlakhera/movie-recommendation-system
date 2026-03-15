@@ -5,11 +5,17 @@ import requests
 
 TMDB_API_KEY = "6a81b7e4a3680f5b37a647ccf3726035"
 
+TMDB_HEADERS = {
+    "accept": "application/json",
+    "User-Agent": "movie-recommender-app"
+}
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 tmdb_cache = {}
 poster_cache = {}
+movie_details_cache = {}
 
 # Load saved model files
 movies = pickle.load(open("movies.pkl", "rb"))
@@ -54,7 +60,9 @@ def fetch_poster(movie_id):
 
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
 
-        response = requests.get(url, timeout=10)
+        headers = TMDB_HEADERS
+
+        response = requests.get(url, headers=TMDB_HEADERS, timeout=10)
 
         if response.status_code != 200:
             return None
@@ -78,11 +86,17 @@ def fetch_poster(movie_id):
 
 def fetch_movie_details(movie_id):
 
+    # Check cache first
+    if movie_id in movie_details_cache:
+        return movie_details_cache[movie_id]
+
     try:
 
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
 
-        response = requests.get(url, timeout=10)
+        headers = TMDB_HEADERS
+
+        response = requests.get(url, headers=TMDB_HEADERS, timeout=10)
 
         if response.status_code != 200:
             return None
@@ -100,7 +114,8 @@ def fetch_movie_details(movie_id):
         if data.get("backdrop_path"):
             backdrop = f"https://image.tmdb.org/t/p/original{data['backdrop_path']}"
 
-        return {
+        movie_data= {
+            "movie_id": movie_id,
             "title": data.get("title"),
             "overview": data.get("overview"),
             "release_date": data.get("release_date"),
@@ -111,6 +126,9 @@ def fetch_movie_details(movie_id):
             "runtime": runtime,
             "tagline": tagline
         }
+
+        movie_details_cache[movie_id] = movie_data
+        return movie_data
 
     except Exception as e:
         print("TMDB error:", e)
@@ -156,7 +174,7 @@ def search_movies():
 @app.route("/movie-details", methods=["GET"])
 def movie_details():
 
-    movie_id = request.args.get("id")
+    movie_id = int(request.args.get("id"))
 
     # Check cache first
     if movie_id in tmdb_cache:
@@ -169,7 +187,9 @@ def movie_details():
 
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
 
-        response = requests.get(url, timeout=10)
+        headers = TMDB_HEADERS
+
+        response = requests.get(url, headers=TMDB_HEADERS, timeout=10)
 
         data = response.json()
 
@@ -212,7 +232,9 @@ def trending_movies():
 
         url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={TMDB_API_KEY}"
 
-        response = requests.get(url, timeout=10)
+        headers = TMDB_HEADERS
+
+        response = requests.get(url, headers=TMDB_HEADERS, timeout=10)
 
         data = response.json()
 
@@ -246,29 +268,44 @@ def trending_movies():
     
 
 @app.route("/trailer", methods=["GET"])
-def get_trailer():
-
+def fetch_trailer():
     movie_id = request.args.get("id")
 
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
-
     try:
-        response = requests.get(url, timeout=10)
+
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
+
+        headers = TMDB_HEADERS
+
+        response = requests.get(url, headers=TMDB_HEADERS, timeout=10)
+
+        if response.status_code != 200:
+            return jsonify({"trailer": None})
+
         data = response.json()
 
-        results = data.get("results", [])
+        results = data.get("results")
+
+        if not results:
+            return jsonify({"trailer": None})
 
         for video in results:
-            if video.get("type") == "Trailer" and video.get("site") == "YouTube":
-                return jsonify({
-                    "trailer": f"https://www.youtube.com/embed/{video['key']}?autoplay=1&mute=1&start=25&controls=0&modestbranding=1&rel=0&iv_load_policy=3"
-                })
+
+            if video.get("site") == "YouTube":
+
+                youtube_key = video.get("key")
+
+                trailer_url = f"https://www.youtube.com/embed/{youtube_key}?autoplay=1"
+
+                return jsonify({"trailer": trailer_url})
 
         return jsonify({"trailer": None})
 
     except Exception as e:
+
         print("Trailer fetch error:", e)
-        return jsonify({"trailer": None})   
+
+        return jsonify({"trailer": None})  
 
 print(movies.columns)
 print(movies[['title','movie_id']].head(5))

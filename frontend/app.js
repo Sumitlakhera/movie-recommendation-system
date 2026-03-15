@@ -12,6 +12,7 @@ const App = () => {
     const [trending, setTrending] = useState([]);
     const [trendingLoading, setTrendingLoading] = useState(true);
     const [previewTrailer, setPreviewTrailer] = useState(null);
+    const [trailerModal, setTrailerModal] = useState(null);
     const hoverTimer = useRef(null);
     const trendingRef = useRef(null);
     const inputRef = useRef(null);
@@ -31,6 +32,22 @@ const App = () => {
 
                 setTrendingLoading(false);
             });
+    }, []);
+
+    useEffect(() => {
+
+        const handleEsc = (e) => {
+
+            if (e.key === "Escape") {
+                setTrailerModal(null);
+            }
+
+        };
+
+        window.addEventListener("keydown", handleEsc);
+
+        return () => window.removeEventListener("keydown", handleEsc);
+
     }, []);
 
     const scrollTrendingLeft = () => {
@@ -393,14 +410,12 @@ const App = () => {
                         {
                             className: "trailer-button",
                             onClick: () => {
-                                fetch(`${API_BASE}/trailer?id=${movie.movie_id}`)
+                                fetch(`${API_BASE}/trailer?id=${searchedMovie.movie_id}`)
                                     .then(res => res.json())
                                     .then(data => {
                                         if (data.trailer) {
-                                            setPreviewTrailer({
-                                                id: "hero",
-                                                url: data.trailer
-                                            });
+                                            setTrailerModal(data.trailer);
+
                                         }
                                     });
                             }
@@ -552,7 +567,32 @@ const App = () => {
                     )
                 )
             )
-        )
+        ),
+
+        trailerModal &&
+        React.createElement(
+            "div",
+            {
+                className: "trailer-overlay",
+                onClick: () => setTrailerModal(null)
+            },
+
+            React.createElement(
+                "div",
+                {
+                    className: "trailer-modal",
+                    onClick: (e) => e.stopPropagation()
+                },
+
+                React.createElement("iframe", {
+                    src: trailerModal,
+                    className: "trailer-player",
+                    frameBorder: "0",
+                    allow: "autoplay; encrypted-media",
+                    allowFullScreen: true
+                })
+            )
+        ),
 
     );
 };
