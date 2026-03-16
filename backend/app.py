@@ -2,8 +2,12 @@ import pickle
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+import os
+from dotenv import load_dotenv
 
-TMDB_API_KEY = "6a81b7e4a3680f5b37a647ccf3726035"
+load_dotenv()
+
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 TMDB_HEADERS = {
     "accept": "application/json",
