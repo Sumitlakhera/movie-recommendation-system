@@ -1,6 +1,14 @@
 import requests
 import pandas as pd
 import time
+import os
+
+session = requests.Session()
+
+session.headers.update({
+    "accept": "application/json",
+    "User-Agent": "movie-recommender-dataset-builder"
+})
 
 TMDB_API_KEY = "6a81b7e4a3680f5b37a647ccf3726035"
 
@@ -12,9 +20,27 @@ TMDB_HEADERS = {
 BASE_URL = "https://api.themoviedb.org/3"
 
 
+def load_existing_movie_ids():
+
+    existing_ids = set()
+
+    if os.path.exists("data/combined_movies.csv"):
+
+        df = pd.read_csv("data/combined_movies.csv")
+        existing_ids = set(df["movie_id"].tolist())
+
+        print(f"Loaded {len(existing_ids)} existing movies")
+
+    return existing_ids
+
+
 def fetch_movies(pages=20):
 
     all_movies = []
+
+    existing_ids = load_existing_movie_ids()
+
+    skipped= 0
 
     for page in range(1, pages + 1):
 
@@ -26,16 +52,16 @@ def fetch_movies(pages=20):
             "api_key": TMDB_API_KEY,
             "language": "en-US",
             "sort_by": "popularity.desc",
+            "primary_release_date.gte": "2017-01-01",
             "page": page
         }
 
         try:
 
-            response = requests.get(
+            response = session.get(
                 url,
                 params=params,
-                headers=TMDB_HEADERS,
-                timeout=10
+                timeout=20
             )
 
             if response.status_code != 200:
@@ -47,11 +73,18 @@ def fetch_movies(pages=20):
 
             for movie in results:
 
+                movie_id = movie.get("id")
+
+                if movie_id in existing_ids:
+                    skipped += 1
+                    continue
+
                 all_movies.append({
-                    "movie_id": movie.get("id"),
+                    "movie_id": movie_id,
                     "title": movie.get("title"),
                     "overview": movie.get("overview")
                 })
+                
 
             time.sleep(0.25)  # avoid API rate limits
 
@@ -60,6 +93,9 @@ def fetch_movies(pages=20):
             print("Connection error, retrying...", e)
             time.sleep(2)
             continue
+
+    print("Skipped existing movies:", skipped)
+    print("New movies fetched:", len(all_movies))
 
     return pd.DataFrame(all_movies)
 
