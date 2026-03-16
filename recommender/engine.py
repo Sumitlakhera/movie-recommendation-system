@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from preprocess import load_datasets, merge_datasets, select_features, extract_features, create_tags
@@ -22,9 +23,13 @@ def build_dataset():
 
 def create_vectors(movies):
 
-    cv = CountVectorizer(max_features=5000, stop_words='english')
+    tfidf = TfidfVectorizer(
+        max_features=8000,
+        stop_words="english",
+        ngram_range=(1,2)
+    )
 
-    vectors = cv.fit_transform(movies['tags']).toarray()
+    vectors = tfidf.fit_transform(movies["tags"]).toarray()
 
     return vectors
 

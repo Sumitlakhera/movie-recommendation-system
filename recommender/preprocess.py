@@ -100,11 +100,21 @@ def extract_features(movies):
 def create_tags(movies):
 
     movies['overview'] = movies['overview'].apply(lambda x: x.split())
-    movies['tags'] = movies['overview'] + movies['genres'] + movies['keywords'] + movies['cast'] + movies['crew']
-    movies['tags'] = movies['tags'].apply(lambda x: " ".join(x))
+
+    movies['weighted_tags'] = (
+        movies['overview'] +
+        movies['genres'] * 3 +
+        movies['keywords'] * 2 +
+        movies['cast'] * 2 +
+        movies['crew'] * 3
+    )
+
+    movies['tags'] = movies['weighted_tags'].apply(lambda x: " ".join(x))
+
     movies['tags'] = movies['tags'].apply(lambda x: x.lower())
+
     movies['tags'] = movies['tags'].apply(stem)
-    
+
     return movies
 
 def collapse(text):
