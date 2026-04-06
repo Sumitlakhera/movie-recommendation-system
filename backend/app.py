@@ -313,5 +313,6 @@ def fetch_trailer():
 
 print(movies.columns)
 print(movies[['title','movie_id']].head(5))
+print("Movies in training:", len(movies))
 if __name__ == "__main__":
     app.run(debug=True)

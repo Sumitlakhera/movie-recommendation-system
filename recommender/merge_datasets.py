@@ -41,7 +41,7 @@ combined = pd.concat([movies, new_movies], ignore_index=True)
 
 
 # Remove duplicates
-combined = combined.drop_duplicates(subset="title")
+combined = combined.drop_duplicates(subset="movie_id")
 
 
 print("Original movies:", len(movies))

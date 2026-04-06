@@ -18,6 +18,8 @@ def build_dataset():
 
     movies = create_tags(movies)
 
+    movies = movies.reset_index(drop=True)
+
     return movies
 
 
