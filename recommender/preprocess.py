@@ -20,8 +20,13 @@ def merge_datasets(movies, credits):
 
 def select_features(movies):
 
-    movies = movies[['movie_id','title','overview','genres','keywords','cast','crew']]
+    movies = movies[
+        ['movie_id','title','overview','genres','keywords','cast','crew',
+         'popularity','vote_average','vote_count','release_date']
+    ]
+
     movies.dropna(inplace=True)
+
     return movies
 
 

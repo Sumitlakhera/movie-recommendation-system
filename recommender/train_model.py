@@ -12,4 +12,6 @@ pickle.dump(movies, open("movies.pkl", "wb"))
 
 pickle.dump(similarity, open("similarity.pkl", "wb"))
 
+print("Training on movies:", len(movies))
+print(movies.columns)
 print("Model saved successfully.")

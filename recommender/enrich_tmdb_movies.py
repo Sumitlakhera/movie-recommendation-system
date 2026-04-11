@@ -18,39 +18,43 @@ TMDB_HEADERS = {
 BASE_URL = "https://api.themoviedb.org/3"
 
 
-def fetch_movie_metadata(movie_id):
+def fetch_movie_metadata(movie_id, retries=3):
 
-    try:
+    for attempt in range(retries):
 
-        url = f"{BASE_URL}/movie/{movie_id}"
+        try:
+            url = f"{BASE_URL}/movie/{movie_id}"
 
-        params = {
-            "api_key": TMDB_API_KEY,
-            "append_to_response": "credits,keywords"
-        }
+            params = {
+                "api_key": TMDB_API_KEY,
+                "append_to_response": "credits,keywords"
+            }
 
-        response = session.get(
-            url,
-            params=params,
-            timeout=20
-        )
+            response = session.get(url, params=params, timeout=20)
 
-        if response.status_code != 200:
-            return None
+            if response.status_code != 200:
+                time.sleep(1)
+                continue
 
-        data = response.json()
+            data = response.json()
 
-        return {
-            "genres": data.get("genres", []),
-            "cast": data.get("credits", {}).get("cast", []),
-            "crew": data.get("credits", {}).get("crew", []),
-            "keywords": data.get("keywords", {}).get("keywords", [])
-        }
+            return {
+                "genres": data.get("genres", []),
+                "cast": data.get("credits", {}).get("cast", []),
+                "crew": data.get("credits", {}).get("crew", []),
+                "keywords": data.get("keywords", {}).get("keywords", []),
 
-    except Exception as e:
+                "popularity": data.get("popularity", 0),
+                "vote_average": data.get("vote_average", 0),
+                "vote_count": data.get("vote_count", 0),
+                "release_date": data.get("release_date", "")
+            }
 
-        print("Metadata fetch error:", e)
-        return None
+        except Exception as e:
+            print(f"Retry {attempt+1} failed for {movie_id}: {e}")
+            time.sleep(2)
+
+    return None
 
 
 def enrich_movies():
@@ -77,10 +81,14 @@ def enrich_movies():
             "genres": metadata["genres"],
             "keywords": metadata["keywords"],
             "cast": metadata["cast"],
-            "crew": metadata["crew"]
+            "crew": metadata["crew"],
+            "popularity": metadata["popularity"],
+            "vote_average": metadata["vote_average"],
+            "vote_count": metadata["vote_count"],
+            "release_date": metadata["release_date"]
         })
 
-        time.sleep(0.8)
+        time.sleep(1.2)
 
     enriched_df = pd.DataFrame(enriched_movies)
 

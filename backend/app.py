@@ -2,6 +2,7 @@ import pickle
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+import json
 import os
 from dotenv import load_dotenv
 
@@ -32,15 +33,114 @@ def recommend(movie):
 
     distances = similarity[movie_index]
 
-    movies_list = sorted(
-        list(enumerate(distances)),
-        reverse=True,
-        key=lambda x: x[1]
-    )[1:6]
+    movies_list = list(enumerate(distances))
+
+    # GET SEARCH MOVIE GENRES
+    search_movie = movies.iloc[movie_index]
+
+    try:
+        search_genres = json.loads(search_movie["genres"])
+        search_genres = [g["name"] for g in search_genres]
+    except:
+        search_genres = []
+
+    # SEARCH KEYWORDS
+    try:
+        search_keywords = json.loads(search_movie["keywords"])
+        search_keywords = [k["name"] for k in search_keywords]
+    except:
+        search_keywords = []
+
+    scored_movies = []
+
+    for i in movies_list:
+
+        idx = i[0]
+        sim_score = i[1]
+
+        if idx == movie_index:
+            continue
+
+        if sim_score < 0.1:
+            continue
+
+        movie_data = movies.iloc[idx]
+
+        #GET CURRENT MOVIE GENRES
+        try:
+            genres = json.loads(movie_data["genres"])
+            genre_names = [g["name"] for g in genres]
+        except:
+            genre_names = []
+
+        #GENRE MATCH SCORE
+        genre_match = len(set(genre_names) & set(search_genres))
+        # stronger genre influence
+        if genre_match > 0:
+            genre_boost = 0.15 + (genre_match * 0.05)
+        else:
+            genre_boost = -0.1   # penalize mismatch
+        
+
+        # CURRENT MOVIE KEYWORDS
+        try:
+            keywords = json.loads(movie_data["keywords"])
+            keyword_names = [k["name"] for k in keywords]
+        except:
+            keyword_names = []
+
+        # KEYWORD MATCH
+        keyword_match = len(set(keyword_names) & set(search_keywords))
+        keyword_boost = keyword_match * 0.1
+        if keyword_match == 0:
+            keyword_boost -= 0.15
+
+        # --- METADATA ---
+        popularity = movie_data.get("popularity", 0)
+        votes = movie_data.get("vote_count", 0)
+        rating = movie_data.get("vote_average", 0)
+
+        # --- RECENCY ---
+        try:
+            year = int(str(movie_data.get("release_date", "2000"))[:4])
+        except:
+            year = 2000
+
+        recency_boost = (year - 2000) * 0.01
+
+
+        # --- FINAL SCORE ---
+        boost = (
+            (popularity * 0.000005) +     
+            (rating * 0.05) +          
+            (votes * 0.00001) +         
+            (recency_boost * 0.5)       
+)
+        if votes < 50:
+            boost *= 0.7
+
+        final_score = (sim_score * 0.8) + boost + genre_boost + keyword_boost
+
+        scored_movies.append((idx, final_score))
+
+    # --- SORT ---
+    scored_movies = sorted(
+        scored_movies,
+        key=lambda x: x[1],
+        reverse=True
+    )[0:5]
+
+    if len(scored_movies) == 0:
+    # fallback to similarity only
+        scored_movies = sorted(
+            list(enumerate(distances)),
+            key=lambda x: x[1],
+            reverse=True
+        )[1:6]
 
     recommendations = []
 
-    for i in movies_list:
+    for i in scored_movies:
 
         title = movies.iloc[i[0]].title
         movie_id = int(movies.iloc[i[0]].movie_id)
